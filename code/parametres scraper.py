@@ -43,6 +43,7 @@ def get_data(driver, url):
     load(driver, '//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div[1]/form/div[2]/div/div/button', 5)#waits for specified xpath to load if it doesnt in the time specified returns False, returns True when element loads
     byty_xpaths = []
     for byt in range(1, 21):
+        load(driver, f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span', 5)
         button = driver.find_element(By.XPATH,f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span')
         button.click()
         load(driver, '/html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[7]', 5)
