@@ -64,8 +64,7 @@ def get_data(driver, url):
                     i -= 1
             print(f'{parametr} je {hodnota}')
         write(hodnoty)
-        driver.back()           
-        
+        driver.back()  
     return hodnoty
         
 def load(driver, xpath, tries):#waits for specified xpath to load if it doesnt in the tries specified returns False, returns True when element loads
