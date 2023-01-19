@@ -40,25 +40,16 @@ def start_sequence(url):
     return driver
 
 def get_data(driver, url):
-    for i in range(5):
-        if driver.find_elements(By.XPATH,'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div[1]/form/div[2]/div/div/button'):    
-            button = driver.find_element(By.XPATH,'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div[1]/form/div[2]/div/div/button')
-            button.click()
-            time.sleep(sleep)
-            print("page loading")
+    load(driver, '//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div[1]/form/div[2]/div/div/button', 5)#waits for specified xpath to load if it doesnt in the time specified returns False, returns True when element loads
     byty_xpaths = []
-    for byt in range(1, 61):
-        for i in range(5):
-            if driver.find_elements(By.XPATH, f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span'):    
-                button = driver.find_element(By.XPATH,f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span')
-                button.click()
-                time.sleep(sleep)
-                print("page loading")
-                
-        tabulka = driver.find_element(By.XPATH, '//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[7]').text
+    for byt in range(1, 21):
+        button = driver.find_element(By.XPATH,f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span')
+        button.click()
+        load(driver, '/html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[7]', 5)
+        tabulka = driver.find_element(By.XPATH, '/html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[7]').text
         tabulka_list = tabulka.splitlines()
         parametry = ["Celková cena:", "Poznámka k ceně:", "ID zakázky:", "Aktualizace:", "Stavba:", "Stav objektu:", "Vlasnictví:", "Podlaží:", "Užitná plocha:", "Plocha podlahová:", "Plocha zahrady:", "Balkón:", "Terasa:", "Sklep:", "Parkování:", "Garáž:", "Datum nastěhování:", "Voda:", "Topení:", "Plyn:", "Telekomunikace:", "Doprava:", "Komunikace:", "Energetická náročnost budovy:", "Bezbariérový:","Vybavení:", "Výtah:"]
-        hodnoty = []
+        hodnoty = [None]*27
         i = 0
         for parametr in parametry:
             i = 0
@@ -71,14 +62,19 @@ def get_data(driver, url):
                     hodnota = None
                     i -= 1
             print(f'{parametr} je {hodnota}')
-            hodnoty.append(hodnota)
-            print(hodnoty)
-            print(len(hodnoty))
-        time.sleep(sleep*2)
+        write(hodnoty)
         driver.back()           
         
-        return hodnoty
+    return hodnoty
         
+def load(driver, xpath, tries):#waits for specified xpath to load if it doesnt in the tries specified returns False, returns True when element loads
+    wait = 1
+    try:
+        myElem = WebDriverWait(driver, wait).until(EC.presence_of_element_located((By.XPATH, xpath)))
+        print("page loaded")
+    except TimeoutException:
+        print("timed out")
+
 def write(values):
     try:
         conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\test3.db")
@@ -88,19 +84,14 @@ def write(values):
     except Exception as e:  # not Error as e
         print(e)
         #quit()
-    print(f"values is {values}")
-    print(f"len(values) is {len(values)}")
-    print(f"len((values,)) is {len((values,))}")
-    print(type(values))
     cursor.executemany("""INSERT INTO test VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
     conn.commit()
     conn.close()
+    print("dataaze aktualizovana")
     
 def main():
     driver= start_sequence(url_byty)
     hodnoty = get_data(driver, url_byty)
-    write(hodnoty)
-
     driver.quit()
 
 if __name__ == "__main__":
