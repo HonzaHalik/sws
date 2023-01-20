@@ -10,9 +10,9 @@ import sqlite3
 from sqlite3 import Error
 import time
 
-
 #TODO
-
+    # linearni regrese model pro zavislost poctu nabidek na repo sazbe, inflaci
+    # pro presnost brat pocet nabidek z katastru / https://www.cuzk.cz/Katastr-nemovitosti/Statisticke-udaje-o-transakcich/Statisticke-udaje-o-vybranych-transakcich-s-ne-(1).aspx
 
 
 
