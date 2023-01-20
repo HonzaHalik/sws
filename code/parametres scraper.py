@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import element_to_be_clickable
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import re
 from selenium.webdriver.common.keys import Keys
 import sqlite3
@@ -36,11 +38,13 @@ def start_sequence(url):
     # Find the button with the specified CSS class and click it
     button = driver.find_element(By.CSS_SELECTOR, ".praha .tspan")
     button.click()
+    #click show ... flats button
+    button = driver.find_element(By.CSS_SELECTOR, "#page-layout > div.content-cover > div.content-inner > div.transcluded-content.ng-scope > div > div > div.filter.ng-scope > form > div.buttons.ng-scope > div > div > button")
+    button.click()
     
     return driver
 
 def get_data(driver, url):
-    load(driver, '//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div[1]/form/div[2]/div/div/button', 5)#waits for specified xpath to load if it doesnt in the time specified returns False, returns True when element loads
     byty_xpaths = []
     for byt in range(1, 21):
         load(driver, f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span', 5)
@@ -61,11 +65,12 @@ def get_data(driver, url):
                     break
                 else:
                     hodnota = None
-                    i -= 1
+                    
+            hodnoty[parametry.index(parametr)] = hodnota
             print(f'{parametr} je {hodnota}')
         write(hodnoty)
         driver.back()  
-    return hodnoty
+
         
 def load(driver, xpath, tries):#waits for specified xpath to load if it doesnt in the tries specified returns False, returns True when element loads
     wait = 1
@@ -87,11 +92,11 @@ def write(values):
     cursor.executemany("""INSERT INTO test VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
     conn.commit()
     conn.close()
-    print("dataaze aktualizovana")
+    print("dataze aktualizovana")
     
 def main():
-    driver= start_sequence(url_byty)
-    hodnoty = get_data(driver, url_byty)
+    driver = start_sequence(url_byty)
+    get_data(driver, url_byty)
     driver.quit()
 
 if __name__ == "__main__":
