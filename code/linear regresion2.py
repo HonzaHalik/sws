@@ -1,5 +1,5 @@
 import sqlite3
-from sklearn import linear_model
+import pandas
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy import stats
@@ -11,48 +11,27 @@ from scipy import stats
 
 
 db_file = fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry4.db"
-
+def linear_regresion(x):
+    return slope * x + intercept
 def csv():
     conn = sqlite3.connect(db_file, isolation_level=None, detect_types=sqlite3.PARSE_COLNAMES)
     db_df = pd.read_sql_query("SELECT * FROM tabulka", conn)
     db_df.to_csv('parametrycsv.csv', index=False)
 
-def fetch():
-    df = pandas.read_csv(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\parametrycsv.csv")
-    print(df)
-    X = df[['Užitná', 'Podlaží']]
-    y = df['cena']
-    
-    regr = linear_model.LinearRegression()
-    regr.fit(X, y)
-    cena_predicted = regr.predict([[70, 60]])
-    print(cena_predicted)
-
-
 df = pandas.read_csv(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\parametrycsv.csv")
 print(df)
 x = df['cena']
 y = df['Užitná']
-
 plt.scatter(x, y)
 #plt.show()
 slope, intercept, r, p, std_err = stats.linregress(x, y)
-def linear_regresion(x):
-    return slope * x + intercept
-
+mymodel = list(map(linear_regresion, x))
+plt.scatter(x, y)
+plt.plot(x, mymodel)
+print(f"r*r je {r*r}")
+plt.show()
 
 def main():
-    #csv()
-    #fetch()
-    mymodel = list(map(linear_regresion, x))
-    plt.scatter(x, y)
-    plt.plot(x, mymodel)
-    print(f"r*r je {r*r}")
-    plt.show()
-
-
-
-
-
-if __name__ == "__main__":
-    main()
+    #csv
+    pass
+main()
