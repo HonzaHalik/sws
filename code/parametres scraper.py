@@ -57,8 +57,9 @@ def get_data(driver, url):
         parametry = ["Celková cena:", "Poznámka k ceně:", "ID zakázky:", "Aktualizace:", "Stavba:", "Stav objektu:", "Vlasnictví:", "Podlaží:", "Užitná plocha:", "Plocha podlahová:", "Plocha zahrady:", "Balkón:", "Terasa:", "Sklep:", "Parkování:", "Garáž:", "Datum nastěhování:", "Voda:", "Topení:", "Plyn:", "Telekomunikace:", "Doprava:", "Komunikace:", "Energetická náročnost budovy:", "Bezbariérový:","Vybavení:", "Výtah:"]
         hodnoty = [None]*27
         parametry_cisla = ["Celková cena:", "Užitná plocha:", "Plocha podlahová:", "Plocha zahrady:", "Balkón:", "Terasa:", "Sklep:"]
-        nutne_parametry = ["Celková cena:", "Užitná plocha:", "Podlaží:"]
-        i = 0
+        
+        nutne_parametry = ["Celková cena:", "Užitná plocha:", "Plocha podlahová:", "Podlaží:", "Energetická náročnost budovy:"]
+        nutne_hodnoty = [None]*5
         for parametr in parametry:
             i = 0
             for i in range(len(tabulka_list)): # hleda hodnotu v kazdem radku tabulky
@@ -76,18 +77,30 @@ def get_data(driver, url):
                 hodnota = hodnota.strip()
                 hodnota_list = hodnota.split(".")
                 hodnota = hodnota_list[0]
+            if parametr == "Energetická náročnost budovy:":
+                pismena = [None, "A", "B", "C", "D", "E", "F", "G"]
+                hodnota, odpad = hodnota.split("-")
+                hodnota = hodnota.replace("Třída", "").strip()
+                hodnota = pismena.index(hodnota)
+                
+            if parametr in nutne_parametry:
+                nutne_hodnoty[nutne_parametry.index(parametr)] = hodnota
+                print(f'{parametr} je {hodnota}')
+
             if not (parametr in nutne_parametry and hodnota == None): #krome bytu bez ceny, plochy, nebo podlazi vsechny zapise jinak pokracuje na dalsi
                 hodnoty[parametry.index(parametr)] = hodnota
-                print(f'{parametr} je {hodnota}')
+                
             else: 
                 print("cena nebo plocha nebo podlazi nejsou dostupne")
                 flag = True #pokud flag tak jde na dalsi byt 
+            
         if flag:# pokud flag tak jde na dalsi byt
             print("flag")
             driver.back()
             # jde na dalsi byt protoze tenhle nema cenu
         else:
-            write(hodnoty) # zapise hodnoty
+            write_values(hodnoty) # zapise hodnoty
+            write_necesarry_values(nutne_hodnoty)
             driver.back() # vrati se na nabidku bytu aby mohl jit na dalsi
 
 def load(driver, xpath, tries): # nekolikrat zkontroluje dostupnost elementu pokud neni dostuny tak si stezuje
@@ -99,16 +112,28 @@ def load(driver, xpath, tries): # nekolikrat zkontroluje dostupnost elementu pok
         print("timed out")
 
 
-def write(values):
+def write_values(values):
     try:
-        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry4.db")
+        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry6.db")
         cursor = conn.cursor()
-        print(sqlite3.version)
         cursor.execute("""CREATE TABLE IF NOT EXISTS tabulka (cena, Poznámka, ID, Aktualizace, Stavba, Stav, Vlasnictví, Podlaží, Užitná, podlahová, zahrada, Balkón, Terasa, Sklep, Parkování, Garáž, nastěhování, Voda, Topení, Plyn, Telekomunikace, Doprava, Komunikace, Energetika, Bezbariérový, Vybavení, Výtah)""")
-    except Exception as e:  # not Error as e
+    except Exception as e:  
         print(e)
         #quit()
     cursor.executemany("""INSERT INTO tabulka VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
+    conn.commit()
+    conn.close()
+    print("dataze aktualizovana")
+
+def write_necesarry_values(values):
+    try:
+        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry6.db")
+        cursor = conn.cursor()
+        cursor.execute("""CREATE TABLE IF NOT EXISTS nutneParametry (Cena, Podlaží, Užitná, Podlahová, Energetika)""")
+    except Exception as e:  
+        print(e)
+        #quit()
+    cursor.executemany("""INSERT INTO nutneParametry VALUES (?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
     conn.commit()
     conn.close()
     print("dataze aktualizovana")
