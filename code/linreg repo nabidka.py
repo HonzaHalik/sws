@@ -33,11 +33,11 @@ def draw_linear_regresion(df):
     plt.show()
     
 def multiple_regresion(df):
-    X = df[["repo", "cena"]]
+    X = df[["repo", "aktivni"]]
     y = df["aktivni"]
     regr = linear_model.LinearRegression()
     regr.fit(X, y)
-    aktivni_predikce = regr.predict([[7,202206]])
+    aktivni_predikce = regr.predict([[700,202206]])
     print(aktivni_predikce)
 
 
@@ -56,8 +56,8 @@ slope, intercept, r, p, std_err = stats.linregress(x, y)
 def main():
     #correlation(df)
     #predict(df)
-    #draw_poly_regresion(df)
-    multiple_regresion(df)
+    draw_poly_regresion(df)
+    #multiple_regresion(df)
     #draw_linear_regresion(df)
 
 main()
