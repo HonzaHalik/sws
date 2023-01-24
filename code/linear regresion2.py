@@ -5,9 +5,7 @@ import pandas as pd
 from scipy import stats
 
 #TODO
-    # linearni regrese model pro zavislost poctu nabidek na repo sazbe, inflaci
-    # pro presnost brat pocet nabidek z katastru / https://www.cuzk.cz/Katastr-nemovitosti/Statisticke-udaje-o-transakcich/Statisticke-udaje-o-vybranych-transakcich-s-ne-(1).aspx
-    #
+
 
 
 db_file = fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry4.db"
@@ -18,7 +16,7 @@ def csv():
     db_df = pd.read_sql_query("SELECT * FROM tabulka", conn)
     db_df.to_csv('parametrycsv.csv', index=False)
 
-#csv
+#csv()
 df = pandas.read_csv(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\parametrycsv.csv")
 print(df)
 x = df['cena']
