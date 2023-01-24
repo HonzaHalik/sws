@@ -18,20 +18,16 @@ def csv():
     db_df = pd.read_sql_query("SELECT * FROM tabulka", conn)
     db_df.to_csv('parametrycsv.csv', index=False)
 
+#csv
 df = pandas.read_csv(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\parametrycsv.csv")
 print(df)
 x = df['cena']
 y = df['Užitná']
-plt.scatter(x, y)
-#plt.show()
-slope, intercept, r, p, std_err = stats.linregress(x, y)
+plt.scatter(x, y) 
+slope, intercept, r, p, std_err = stats.linregress(x, y) 
 mymodel = list(map(linear_regresion, x))
-plt.scatter(x, y)
 plt.plot(x, mymodel)
 print(f"r*r je {r*r}")
 plt.show()
 
-def main():
-    #csv
-    pass
-main()
+
