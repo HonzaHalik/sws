@@ -1,19 +1,10 @@
 import sqlite3
-values = [('19 850 000 Kč za nemovitost', 'včetně poplatků, včetně provize, včetně právního servisu', 'N6251', '29.09.2022', 'Cihlová')]
-def write(values):
-    try:
-        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\test2.db")
-        cursor = conn.cursor()
-        print(sqlite3.version)
-        cursor.execute("""CREATE TABLE IF NOT EXISTS testtable (Celkova_cena, Poznamka_k_cene, ID_zakazky, Aktualizace, Stavba)""")
-    except Exception as e:  # not Error as e
-        print(e)
-        #quit()
-    print(f"values is {values}")
-    print(f"len(values) is {len(values)}")
-    print(f"len((values,)) is {len((values,))}")
-    cursor.executemany("""INSERT INTO testtable (Celkova_cena, Poznamka_k_cene, ID_zakazky, Aktualizace, Stavba) VALUES (?, ?, ?, ?, ?)""", values) #Insert tuple of values
-    conn.commit()
-    conn.close()
-
-write(values)
+try:
+    conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\development\github\sws\code\parametry6.db")
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS tabulka (cena, Poznámka, ID, Aktualizace, Stavba, Stav, Vlasnictví, Podlaží, Užitná, podlahová, zahrada, Balkón, Terasa, Sklep, Parkování, Garáž, nastěhování, Voda, Topení, Plyn, Telekomunikace, Doprava, Komunikace, Energetika, Bezbariérový, Vybavení, Výtah)""")
+except Exception as e:  
+    print(e)
+    quit()
+else:
+    cursor.execute("""DELETE FROM nutneParametry WHERE rowid = 20;""")

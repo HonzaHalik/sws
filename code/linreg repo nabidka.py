@@ -11,7 +11,7 @@ def linear_regresion(x):
 
 def draw_poly_regresion(df):
     x = df["repo"]/100
-    y = df["cena"]
+    y = df["aktivni"]
     mymodel = numpy.poly1d(numpy.polyfit(x, y, 3))
     plt.scatter(x, y)
     myline = numpy.linspace(0, 7, 100)
@@ -25,7 +25,7 @@ def correlation(df):
 
 def draw_linear_regresion(df):
     x = df["repo"]/100
-    y = df["cena"]
+    y = df["aktivni"]
     plt.scatter(x, y)
     mymodel = list(map(linear_regresion, x))
     plt.plot(x, mymodel)
@@ -33,7 +33,7 @@ def draw_linear_regresion(df):
     plt.show()
     
 def multiple_regresion(df):
-    X = df[["repo", "aktivni"]]
+    X = df[["repo", "cena"]]
     y = df["aktivni"]
     regr = linear_model.LinearRegression()
     regr.fit(X, y)
@@ -56,8 +56,8 @@ slope, intercept, r, p, std_err = stats.linregress(x, y)
 def main():
     #correlation(df)
     #predict(df)
-    draw_poly_regresion(df)
-    #multiple_regresion(df)
+    #draw_poly_regresion(df)
+    multiple_regresion(df)
     #draw_linear_regresion(df)
 
 main()
