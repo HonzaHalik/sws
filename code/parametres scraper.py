@@ -9,14 +9,15 @@ from selenium.webdriver.common.keys import Keys
 import sqlite3
 from sqlite3 import Error
 import time
+from tqdm import tqdm
 
 #TODO
     # linearni regrese model pro zavislost poctu nabidek na repo sazbe, inflaci
     # pro presnost brat pocet nabidek z katastru / https://www.cuzk.cz/Katastr-nemovitosti/Statisticke-udaje-o-transakcich/Statisticke-udaje-o-vybranych-transakcich-s-ne-(1).aspx
 
+    #pridavat do databaze jen byty s id co tam jeste nejsou
 
 
-db_file = fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\test.db"
 url_byty = "https://www.sreality.cz/hledani/byty"
 url_domy = "https://www.sreality.cz/hledani/domy"
 
@@ -46,7 +47,8 @@ def start_sequence(url):
 
 def get_data(driver, url):
     byty_xpaths = []
-    for byt in range(1, 20):
+    
+    for byt in tqdm(range(1, 20)):
         flag = False
         load(driver, f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span', 5)
         button = driver.find_element(By.XPATH,f'//*[@id="page-layout"]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div[{byt}]/div/div/span/h2/a/span')
@@ -77,7 +79,9 @@ def get_data(driver, url):
                 hodnota = hodnota.strip()
                 hodnota_list = hodnota.split(".")
                 hodnota = hodnota_list[0]
-            if parametr == "Energetická náročnost budovy:":
+                if not hodnota.isnumeric():
+                    flag = True
+            if parametr == "Energetická náročnost budovy:" and hodnota != None:
                 pismena = [None, "A", "B", "C", "D", "E", "F", "G"]
                 hodnota, odpad = hodnota.split("-")
                 hodnota = hodnota.replace("Třída", "").strip()
@@ -85,17 +89,17 @@ def get_data(driver, url):
                 
             if parametr in nutne_parametry:
                 nutne_hodnoty[nutne_parametry.index(parametr)] = hodnota
-                print(f'{parametr} je {hodnota}')
+                #print(f'{parametr} je {hodnota}')
 
             if not (parametr in nutne_parametry and hodnota == None): #krome bytu bez ceny, plochy, nebo podlazi vsechny zapise jinak pokracuje na dalsi
                 hodnoty[parametry.index(parametr)] = hodnota
                 
             else: 
-                print("cena nebo plocha nebo podlazi nejsou dostupne")
+                #print("cena nebo plocha nebo podlazi nejsou dostupne")
                 flag = True #pokud flag tak jde na dalsi byt 
             
         if flag:# pokud flag tak jde na dalsi byt
-            print("flag")
+            #print("flag")
             driver.back()
             # jde na dalsi byt protoze tenhle nema cenu
         else:
@@ -107,36 +111,35 @@ def load(driver, xpath, tries): # nekolikrat zkontroluje dostupnost elementu pok
     wait = 5
     try:
         myElem = WebDriverWait(driver, wait).until(EC.presence_of_element_located((By.XPATH, xpath)))
-        print("page loaded")
+        #print("page loaded")
     except TimeoutException:
         print("timed out")
 
 
 def write_values(values):
     try:
-        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry6.db")
+        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\development\github\sws\code\parametry8.db")
         cursor = conn.cursor()
         cursor.execute("""CREATE TABLE IF NOT EXISTS tabulka (cena, Poznámka, ID, Aktualizace, Stavba, Stav, Vlasnictví, Podlaží, Užitná, podlahová, zahrada, Balkón, Terasa, Sklep, Parkování, Garáž, nastěhování, Voda, Topení, Plyn, Telekomunikace, Doprava, Komunikace, Energetika, Bezbariérový, Vybavení, Výtah)""")
     except Exception as e:  
         print(e)
-        #quit()
     cursor.executemany("""INSERT INTO tabulka VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
     conn.commit()
     conn.close()
-    print("dataze aktualizovana")
+    #print("dataze aktualizovana")
 
 def write_necesarry_values(values):
     try:
-        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\Dokumenty\GitHub\sws\code\parametry6.db")
+        conn = sqlite3.connect(fr"C:\Users\halik\OneDrive\development\github\sws\code\parametry8.db")
         cursor = conn.cursor()
-        cursor.execute("""CREATE TABLE IF NOT EXISTS nutneParametry (Cena, Podlaží, Užitná, Podlahová, Energetika)""")
+        cursor.execute("""CREATE TABLE IF NOT EXISTS nutneParametry (Cena, Užitná, Podlahová, Podlaží, Energetika)""")
     except Exception as e:  
         print(e)
         #quit()
     cursor.executemany("""INSERT INTO nutneParametry VALUES (?, ?, ?, ?, ?)""", (values,)) #Insert tuple of values
     conn.commit()
     conn.close()
-    print("dataze aktualizovana")
+    #print("dataze aktualizovana")
     
 def main():
     driver = start_sequence(url_byty)
