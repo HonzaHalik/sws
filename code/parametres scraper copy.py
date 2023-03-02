@@ -60,7 +60,7 @@ def get_data(driver, url):
         hodnoty = [None]*27
         parametry_cisla = ["Celková cena:", "Užitná plocha:", "Plocha podlahová:", "Plocha zahrady:", "Balkón:", "Terasa:", "Sklep:"]
         
-        nutne_parametry = ["ID zakázky:", "Celková cena:", "Užitná plocha:", "Plocha podlahová:", "Podlaží:", "Energetická náročnost budovy:"]
+        nutne_parametry = ["ID zak", "Celková cena:", "Užitná plocha:", "Plocha podlahová:", "Podlaží:", "Energetická náročnost budovy:"]
         nutne_hodnoty = [None]*5
         for parametr in parametry:
             i = 0
